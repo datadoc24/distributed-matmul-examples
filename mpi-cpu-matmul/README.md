@@ -1,10 +1,9 @@
 ## A distributed matrix multiply using MPI ##
 To run it, create a hostfile in the form
-
+```
 myhostname1 slots=12
-
 myhostname2 slots=12
-
+```
 ..where the number of slots equals the number of cores on the host that you want allow MPI processes to be allocated to.
 
 Configure passwordless SSH between all hosts, then:

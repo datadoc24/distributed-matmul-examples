@@ -1,11 +1,12 @@
 ## A distributed matrix multiply using MPI ##
 To run it, create a hostfile in the form
 
-myhostname1 slots=<number of CPU cores in this host>
-myhostname2 slots=<number of CPU cores in this host>
+myhostname1 slots=12
+myhostname2 slots=12
 
-...and configure passwordless SSH between all hosts.
-Then:
+..where the number of slots equals the number of cores on the host that you want allow MPI processes to be allocated to.
+
+Configure passwordless SSH between all hosts, then:
 ```
 mpirun -hostfile hostfile --mca btl_tcp_if_include 192.168.0.0/24 -np 10 /home/abe/mpi-tests/matrix_multiply
 ```

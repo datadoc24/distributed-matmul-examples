@@ -32,7 +32,7 @@ Use mpirun to execute the program
 ```
 mpirun -hostfile hostfile --mca btl_tcp_if_include 192.168.0.0/24 -np 10 /home/abe/mpi-tests/matrix_multiply
 ```
-**Explanation of parameters:**
+**Explanation of parameters:**  
 hostfile: the hostfile containing the resolvable DNS hostnames (or IP addresses) of the compute hosts that will run the distributed processes;  
 btl_tcp_if_include: a filter that determines what network interfaces on each host will be used for inter-process SSH comms. Because the IP interface names might differ on each host, I found that using the subnet works best. 'btl' stands for 'byte transport layer' in MPI-speak.  
 np: Number of processes to split the workload into. In this matrix example, the matrix 'SIZE' parameter must be divisible by the number of processes.  

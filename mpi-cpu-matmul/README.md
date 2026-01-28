@@ -1,10 +1,10 @@
 ## A distributed matrix multiply using MPI ##
 A C program that:
-    - Creates two 1000x1000 matrices with random floating point values between 0 and 1
-    - Uses MPI to distribute matrix multiplication across multiple processes
-    - Each process prints debug messages showing its rank and progress
-    - Process 0 initializes matrices and gathers final results
-    - All processes participate in the distributed computation
+- Creates two 1000x1000 matrices with random floating point values between 0 and 1
+- Uses MPI to distribute matrix multiplication across multiple processes
+- Each process prints debug messages showing its rank and progress
+- Process 0 initializes matrices and gathers final results
+- All processes participate in the distributed computation
 
 ### Install MPI and build the program ###
 Install openmpi and its dev package:

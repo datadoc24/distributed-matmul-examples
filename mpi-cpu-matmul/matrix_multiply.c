@@ -3,22 +3,22 @@
 #include <mpi.h>
 #include <time.h>
 
-#define SIZE 100
+#define SIZE 1000
 
-void initialize_matrix(float matrix[SIZE][SIZE]) {
+void initialize_matrix(float *matrix) {
     srand(time(NULL));
     for (int i = 0; i < SIZE; i++) {
         for (int j = 0; j < SIZE; j++) {
-            matrix[i][j] = (float)rand() / RAND_MAX;
+            matrix[i * SIZE + j] = (float)rand() / RAND_MAX;
         }
     }
 }
 
-void print_matrix_sample(float matrix[SIZE][SIZE], int rank) {
+void print_matrix_sample(float *matrix, int rank) {
     printf("Process %d - Matrix sample (first 5x5):\n", rank);
     for (int i = 0; i < 5; i++) {
         for (int j = 0; j < 5; j++) {
-            printf("%.3f ", matrix[i][j]);
+            printf("%.3f ", matrix[i * SIZE + j]);
         }
         printf("\n");
     }
@@ -27,7 +27,7 @@ void print_matrix_sample(float matrix[SIZE][SIZE], int rank) {
 
 int main(int argc, char *argv[]) {
     int rank, size;
-    float A[SIZE][SIZE], B[SIZE][SIZE], C[SIZE][SIZE];
+    float *A, *B, *C;
     float *local_A, *local_C;
     int rows_per_process;
 
@@ -46,8 +46,16 @@ int main(int argc, char *argv[]) {
         return 1;
     }
 
+    A = malloc(SIZE * SIZE * sizeof(float));
+    B = malloc(SIZE * SIZE * sizeof(float));
+    C = malloc(SIZE * SIZE * sizeof(float));
     local_A = malloc(rows_per_process * SIZE * sizeof(float));
     local_C = malloc(rows_per_process * SIZE * sizeof(float));
+
+    if (!A || !B || !C || !local_A || !local_C) {
+        printf("Process %d: Memory allocation failed\n", rank);
+        MPI_Abort(MPI_COMM_WORLD, 1);
+    }
 
     if (rank == 0) {
         printf("Process %d: Initializing matrices...\n", rank);
@@ -72,7 +80,7 @@ int main(int argc, char *argv[]) {
         for (int j = 0; j < SIZE; j++) {
             local_C[i * SIZE + j] = 0.0;
             for (int k = 0; k < SIZE; k++) {
-                local_C[i * SIZE + j] += local_A[i * SIZE + k] * B[k][j];
+                local_C[i * SIZE + j] += local_A[i * SIZE + k] * B[k * SIZE + j];
             }
         }
     }
@@ -88,12 +96,19 @@ int main(int argc, char *argv[]) {
         print_matrix_sample(C, rank);
         printf("Process %d: Matrix multiplication complete!\n", rank);
 
-        printf("Process %d: Result verification - C[0][0] = %.6f\n", rank, C[0][0]);
-        printf("Process %d: Result verification - C[50][50] = %.6f\n", rank, C[50][50]);
-        printf("Process %d: Result verification - C[99][99] = %.6f\n", rank, C[99][99]);
+        printf("Process %d: Result verification - C[0][0] = %.6f\n", rank, C[0]);
+        if (SIZE > 50) {
+            printf("Process %d: Result verification - C[50][50] = %.6f\n", rank, C[50 * SIZE + 50]);
+        }
+        if (SIZE > 99) {
+            printf("Process %d: Result verification - C[99][99] = %.6f\n", rank, C[99 * SIZE + 99]);
+        }
     }
 
     printf("Process %d: Cleaning up and finalizing\n", rank);
+    free(A);
+    free(B);
+    free(C);
     free(local_A);
     free(local_C);
 
